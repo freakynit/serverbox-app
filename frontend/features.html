@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Features — Serverbox</title>
+  <meta name="description" content="The full Serverbox feature set: core SSH tools (dashboards, terminal with per-tab sessions, processes, systemd, SFTP, Docker/Podman, logs, ports), browser-style workspace tabs (parallel connections, same-server duplicates, drag-reorder), administration (cron, APT, users, multi-server, sudo, reliable commands), and operations (Compose, firewall, SSH keys, security, saved commands, and tunnels)." />
+  <link rel="icon" href="favicon.png?v=3" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Manrope:wght@400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="brand" href="index.html" aria-label="Serverbox home">
+      <img src="favicon.png?v=3" alt="" aria-hidden="true" />
+      <b>Serverbox</b>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="features.html">Features</a>
+      <a href="download.html">Download</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-primary nav__cta" href="download.html">Download</a>
+    <button class="nav__menu-btn" data-menu-toggle aria-label="Toggle menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+  <div class="nav__mobile" data-menu-panel>
+    <a href="features.html">Features</a>
+    <a href="download.html">Download</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</header>
+
+<main>
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="wrap hero__inner">
+    <p class="eyebrow reveal"><span class="dot"></span>Features</p>
+    <h1 class="reveal d1">Everything you reach for over SSH, in one window.</h1>
+    <p class="lead reveal d2">Serverbox brings the everyday Linux operations you already run by hand into one calm window — with browser-style workspace tabs so you can keep several servers, or several views of one server, open side by side and drag to reorder.</p>
+    <div class="btn-row reveal d3">
+      <a class="btn btn-primary" href="download.html">Download Serverbox</a>
+      <a class="btn btn-outline" href="index.html">Back to overview</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CORE ===================== -->
+<section class="section section-divider" id="core">
+  <div class="wrap">
+    <div class="split" style="margin-bottom:3rem">
+      <div class="shead reveal">
+        <p class="eyebrow"><span class="dot"></span>Core</p>
+        <h2 style="margin-top:1rem">The essentials</h2>
+      </div>
+      <p class="lead reveal d1" style="align-self:end">The essentials that make a control panel worth opening instead of a terminal. Everything else builds on this layer.</p>
+    </div>
+
+    <div class="bgrid cols-3">
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>SSH connection management</h3><p>Multiple profiles with password or private-key auth, key discovery &amp; <code class="ic">ssh_config</code> import, connection testing, automatic reconnect, bastion routing, tags/groups/search, and secrets in an encrypted local vault.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg><h3>Server dashboard</h3><p>Hostname, OS, kernel, arch, uptime, load, CPU utilisation, core count, RAM, swap, per-mount disk and network interfaces — connecting first, then filling cards progressively.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 8 12 4 16"/><line x1="12" y1="16" x2="20" y2="16"/></svg><h3>Integrated SSH terminal</h3><p>Real PTY, interactive commands, resize, ANSI/xterm, copy/paste, history, reconnect, sudo, and shell detection via xterm — sessions are bound per workspace tab so you can keep a shell alive while switching tabs.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9h.01M6 13h.01M6 17h.01M10 9h8M10 13h8M10 17h5"/></svg><h3>Process manager</h3><p>PID, process/user, CPU &amp; RAM %, RSS, command and runtime, with sort/filter/search, periodic refresh, SIGTERM and SIGKILL.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><h3>systemd service manager</h3><p>List with running/stopped/failed state and search; start, stop, restart, reload, enable and disable; unit details and recent journal entries.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><h3>Remote file manager</h3><p>SFTP browser with breadcrumbs, upload/download, rename, delete, create, permissions, ownership, hidden files, text preview &amp; editor, and drag-and-drop uploads.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><h3>Directory transfers</h3><p>Recursive directory upload/download preserving hierarchy and permissions where possible, with progress, cancel/retry and conflict handling.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1.5"/><rect x="14" y="2" width="8" height="8" rx="1.5"/><rect x="2" y="14" width="8" height="8" rx="1.5"/><rect x="14" y="14" width="8" height="8" rx="1.5"/></svg><h3>Docker &amp; Podman</h3><p>Containers, stats, logs, exec shells, port mappings, mounts, networks; images, volumes, networks with inspect, pull and GUI creation.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4z"/><path d="M4 12h10v8H4z"/><path d="M18 12h2v8h-2z"/></svg><h3>Logs</h3><p>Journalctl viewer by service, follow/tail, pause, search, severity, time range and copy/export — plus Docker container log sources.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><h3>Ports &amp; connections</h3><p>Listening ports and established connections, TCP/UDP, local &amp; remote addresses, PID and process name, IPv4/IPv6, with PID-to-service mapping.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><h3>Light &amp; dark appearance</h3><p>A calm, cross-platform desktop workspace with a full light/dark visual system and responsive layout.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="1.4" fill="currentColor"/><circle cx="7" cy="12" r="1.4" fill="currentColor"/><circle cx="7" cy="18" r="1.4" fill="currentColor"/></svg><h3>Workspace tabs</h3><p>Browser-style, drag-reorderable tabs for parallel connections. Open the same server twice for side-by-side compare — each tab keeps its own view, dashboard snapshot and terminal sessions.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg><h3>Multiple servers</h3><p>A sidebar of machines with groups, tags, favorites, search, status indicators, recent ordering and fast switching across every saved profile — plus workspace tabs so many can stay open at once.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WORKSPACE TABS ===================== -->
+<section class="section section-divider" id="workspace-tabs">
+  <div class="wrap">
+    <div class="split" style="align-items:center">
+      <div class="shead reveal">
+        <p class="eyebrow"><span class="dot"></span>Workspace tabs</p>
+        <h2 style="margin-top:1rem">Stay in several places at once.</h2>
+        <p class="lead" style="margin-top:1rem">A browser-style tab strip above the workspace lets you keep many server workspaces open in parallel. Tabs are draggable, remember their order, and each one keeps its own view, overview snapshot, and terminal sessions — even when two tabs point at the same host.</p>
+        <ul class="ticks reveal d1">
+          <li>Parallel connections — mix different servers or the same server opened twice for comparison.</li>
+          <li>Each tab remembers its view, snapshot metrics and bound terminal sessions.</li>
+          <li>Drag tabs to reorder with a live drop indicator; close any tab without disconnecting siblings.</li>
+          <li>Switching tabs is instant — no re-fetch until you hit Refresh.</li>
+        </ul>
+      </div>
+      <div class="reveal d1">
+        <div class="tab-demo" role="img" aria-label="Workspace tabs showing four open workspaces with one server duplicated.">
+          <div class="tab-demo__bar">
+            <span class="tab-demo__dots"><i></i><i></i><i></i></span>
+            <span class="tab-demo__label">serverbox — 4 workspaces</span>
+          </div>
+          <div class="tab-demo__strip" aria-hidden="true">
+            <div class="tab-demo__tab active"><span class="led busy"></span>web-prod-01<span class="close">×</span></div>
+            <div class="tab-demo__tab"><span class="led up"></span>web-prod-01 <small>logs</small><span class="close">×</span></div>
+            <div class="tab-demo__tab"><span class="led up"></span>api-prod-02<span class="close">×</span></div>
+            <div class="tab-demo__tab"><span class="led up"></span>db-prod-03<span class="close">×</span></div>
+          </div>
+          <div class="tab-demo__body">
+            <div class="tab-demo__side">
+              <span class="tag">Servers</span>
+              <div class="tab-demo__side-item active"><span class="led busy"></span>web-prod-01</div>
+              <div class="tab-demo__side-item"><span class="led up"></span>api-prod-02</div>
+              <div class="tab-demo__side-item"><span class="led up"></span>db-prod-03</div>
+            </div>
+            <div class="tab-demo__main">
+              <div style="display:flex; gap:.5rem; flex-wrap:wrap; font-family:var(--mono); font-size:10px; color:rgba(26,23,20,0.45); letter-spacing:.06em; text-transform:uppercase"><span>Dashboard</span><span style="opacity:.3">/</span><span>Terminal ×2</span><span style="opacity:.3">/</span><span>Logs</span></div>
+              <div class="mock__cards">
+                <div class="mc"><span class="tag">CPU</span><div class="v">38<small>%</small></div><div class="bar"><i class="o" style="width:38%"></i></div></div>
+                <div class="mc"><span class="tag">Memory</span><div class="v">6.2<small>/16 GB</small></div><div class="bar"><i class="m" style="width:39%"></i></div></div>
+              </div>
+              <div class="mock__term">
+                <div><span class="u">ops@web-prod-01</span>:<span class="p">~$</span> journalctl -u nginx -f<span class="caret"></span></div>
+              </div>
+              <div class="tab-demo__hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg> Drag to reorder · duplicate any server into two independent tabs</div>
+            </div>
+          </div>
+        </div>
+        <p class="muted" style="margin-top:1rem; font-size:.9rem">Keep a deployment on one tab and live logs on another — both connected to the same host — without splitting into another window.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BASTION & JUMP HOSTS ===================== -->
+<section class="section section-divider" id="bastion">
+  <div class="wrap">
+    <div class="split" style="align-items:center">
+      <div class="shead reveal">
+        <p class="eyebrow"><span class="dot"></span>Bastion &amp; jump hosts</p>
+        <h2 style="margin-top:1rem">Reach locked-down servers through a bastion.</h2>
+        <p class="lead" style="margin-top:1rem">Pick any saved profile as the jump host for another, and Serverbox chains the connection hop by hop — recursive ProxyJump-style routing for terminals, SFTP, commands, and tunnels alike.</p>
+        <ul class="ticks reveal d1">
+          <li>Each hop authenticates with its own encrypted credentials and verified host key.</li>
+          <li>Routes can be nested several layers deep; cycles are caught before you connect.</li>
+          <li>Deleting a bastion cleanly unlinks its dependent connection profiles.</li>
+        </ul>
+      </div>
+      <div class="reveal d1">
+        <div class="hops">
+          <div class="hop you"><span class="tag">Your device</span><b>Serverbox</b></div>
+          <span class="hop-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+          <div class="hop bastion"><span class="tag">Bastion</span><b>jump-prod</b></div>
+          <span class="hop-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+          <div class="hop target"><span class="tag">Target</span><b>db-prod-03</b></div>
+        </div>
+        <p class="muted" style="margin-top:1rem; font-size:.9rem">The same chain carries terminals, file transfers, remote commands, and SSH tunnels — no separate setup per tool.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ADMINISTRATION ===================== -->
+<section class="section section-divider" id="administration">
+  <div class="wrap">
+    <div class="split" style="margin-bottom:3rem">
+      <div class="shead reveal">
+        <p class="eyebrow"><span class="dot"></span>Administration</p>
+        <h2 style="margin-top:1rem">Everyday upkeep</h2>
+      </div>
+      <p class="lead reveal d1" style="align-self:end">Tools that quietly hide themselves when a server can't support them, instead of failing late.</p>
+    </div>
+
+    <div class="bgrid cols-3">
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><h3>Cron manager</h3><p>Current-user crontab add/edit/delete, enable/disable, validation, presets, human-readable schedules and next-run estimates; read-only <code class="ic">/etc/crontab</code> &amp; <code class="ic">/etc/cron.d</code>.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 12 3l9 5-9 5z"/><path d="m3 8 9 5 9-5M3 8v8l9 5 9-5V8"/></svg><h3>APT packages</h3><p>Installed &amp; available package search, package details, pending upgrades, update, install, remove and upgrade on Debian &amp; Ubuntu.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20a6 6 0 0 1 7-5.6"/></svg><h3>Users &amp; groups</h3><p>UID/GID, home, shell, membership, last login &amp; lock state; create/delete users, lock, change shell/group, and warned password resets.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 12h5"/><path d="M13 8l3 4-3 4"/></svg><h3>Workspace tabs</h3><p>Browser-style, drag-reorderable tabs for parallel connections — open the same server in two tabs, each with its own view, snapshot and terminals, and reorder by dragging.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="1.4" fill="currentColor"/><circle cx="7" cy="12" r="1.4" fill="currentColor"/><circle cx="7" cy="18" r="1.4" fill="currentColor"/></svg><h3>Multi-server UX</h3><p>Grouped &amp; tagged sidebar, favorites, recent ordering, status indicators, fast switching and profile duplication.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="m9 12 2 2 4-4"/></svg><h3>Sudo &amp; root access</h3><p>Use root, passwordless sudo, or your encrypted per-server sudo credential — resolved safely, and never exposed on the command line.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="13" y1="17" x2="20" y2="17"/><line x1="13" y1="12" x2="20" y2="12"/></svg><h3>Reliable remote commands</h3><p>Every action runs over SSH with cancellation, reconnect on a dropped connection, and clean output — so long-running commands survive a flaky link.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><h3>Smart feature gating</h3><p>On connect, Serverbox detects what each server supports — distro, package manager, init system, containers and sudo — and only shows the tools that actually work there.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg><h3>Master password</h3><p>Setup, change and complete credential reset with explicit unrecoverable-password warnings. Host keys verified through <code class="ic">known_hosts</code> with fingerprint review.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><h3>Fast on big servers</h3><p>Large remote collections load in pages instead of one big snapshot, and the overview stops loading the moment you navigate away. Processes, services, entries and containers stream in as they arrive.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== OPERATIONS ===================== -->
+<section class="section section-divider" id="operations">
+  <div class="wrap">
+    <div class="split" style="margin-bottom:3rem">
+      <div class="shead reveal">
+        <p class="eyebrow"><span class="dot"></span>Operations</p>
+        <h2 style="margin-top:1rem">Operations</h2>
+      </div>
+      <p class="lead reveal d1" style="align-self:end">Where Serverbox pulls ahead of a plain SSH client — Compose, firewall, access management, security checks, and tunnels.</p>
+    </div>
+
+    <div class="bgrid cols-3">
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg><h3>Docker Compose</h3><p>Discover projects across the plugin, <code class="ic">docker-compose</code> &amp; <code class="ic">podman-compose</code>; services, dependency topology, lifecycle, logs, exec, rebuild, pull and scale.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="M12 8v4"/></svg><h3>Firewall</h3><p>UFW &amp; firewalld rule visibility with guarded allow, deny, enable and disable. Explicit confirmation; no hidden fallback; the active SSH port stays allowed.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="10" r="3"/><path d="M11 10h9M16 7v6M20 7v6"/><circle cx="8" cy="10" r="6.5"/></svg><h3>Authorized keys</h3><p>Remote <code class="ic">authorized_keys</code> management with fingerprints, add/remove, and lockout warnings before you replace a key that could lock you out.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg><h3>Security posture</h3><p>Update &amp; reboot status, kernel and container-runtime version checks, and common one-click maintenance actions across the host.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 9 12 4 17"/><line x1="13" y1="17" x2="20" y2="17"/></svg><h3>Saved commands</h3><p>A dedicated workspace for named actions like "Tail API logs" or "Check Docker disk usage" — edit, delete, and run on demand.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M4 12a8 8 0 0 0 16 0"/><path d="M12 4v16"/></svg><h3>SSH tunnels</h3><p>Local, remote and SOCKS5 forwarding saved as first-class workspaces, run on independent verified SSH sessions — never persisted.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h10l4 4v12H5z"/><path d="M9 4v4h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg><h3>Server notes</h3><p>Purpose, provider, production/staging, URLs and emergency instructions — stored with the profile and included in sidebar search.</p></div>
+      <div class="bcell reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7.5 7.5 11 16M16.5 7.5 13 16"/></svg><h3>Compose topology</h3><p>A dependency graph per Compose project. Environment variable <em>names</em> are shown; resolved values are never rendered.</p></div>
+      <div class="bcell reveal d1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg><h3>One-click actions</h3><p>Reboot, restart SSH, restart Docker, update package indexes and install common tooling — guarded server actions you can confirm and run.</p></div>
+      <div class="bcell reveal d2"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg><h3>Fast Compose scanning</h3><p>Finds Compose projects under your home directory and common locations in a single SSH pass, so even busy servers stay responsive.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DARK CTA ===================== -->
+<section class="section dark">
+  <div class="wrap">
+    <div class="split" style="align-items:center">
+      <div class="reveal">
+        <p class="eyebrow"><span class="dot"></span>Ready</p>
+        <h2 style="margin-top:1rem">From one server to a hundred, without an agent.</h2>
+        <p class="lead" style="margin-top:1rem">Download the app, connect to your first server, and every tool is ready in the same workspace.</p>
+        <div class="btn-row" style="margin-top:2rem">
+          <a class="btn btn-primary" href="download.html">Download Serverbox <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn btn-outline" href="contact.html">Contact us</a>
+        </div>
+      </div>
+      <ul class="stats reveal d1">
+        <li class="stat"><p class="num">0<span class="plus">+</span></p><p class="lab">Agents installed on your servers</p></li>
+        <li class="stat"><p class="num">2×</p><p class="lab">Container runtimes — Docker &amp; Podman</p></li>
+        <li class="stat"><p class="num">3</p><p class="lab">Desktop platforms — macOS, Windows, Linux</p></li>
+        <li class="stat"><p class="num">AES-256</p><p class="lab">Encrypted local vault</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__cols">
+      <div class="foot__col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Capabilities</h5>
+        <ul>
+          <li><a href="features.html#core">Dashboards &amp; terminals</a></li>
+          <li><a href="features.html#core">Files &amp; SFTP</a></li>
+          <li><a href="features.html#operations">Docker &amp; Podman</a></li>
+          <li><a href="features.html#operations">Compose &amp; tunnels</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Security</h5>
+        <ul>
+          <li><a href="features.html">Agentless</a></li>
+          <li><a href="features.html">Encrypted vault</a></li>
+          <li><a href="#" id="themeNote">Light &amp; dark</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Download</h5>
+        <ul>
+          <li><a href="download.html#macos">macOS</a></li>
+          <li><a href="download.html#windows">Windows</a></li>
+          <li><a href="download.html#linux">Linux</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__rule"></div>
+    <div class="foot__bottom">
+      <p>© <span id="year">2025</span> Serverbox · Agentless SSH control panel</p>
+      <div class="foot__legal">
+        <a href="download.html">Download</a>
+        <a href="features.html">Features</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+  <div class="wordmark" aria-hidden="true">Serverbox</div>
+</footer>
+
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+<script src="app.js"></script>
+</body>
+</html>

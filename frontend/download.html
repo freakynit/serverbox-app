@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download — Serverbox</title>
+  <meta name="description" content="Download Serverbox for macOS, Windows, and Linux. Native desktop builds for Apple Silicon and Intel Macs, x86_64 and ARM64 Windows, and AppImage, DEB, and RPM packages for Linux." />
+  <link rel="icon" href="favicon.png?v=3" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Manrope:wght@400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="brand" href="index.html" aria-label="Serverbox home">
+      <img src="favicon.png?v=3" alt="" aria-hidden="true" />
+      <b>Serverbox</b>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="features.html">Features</a>
+      <a href="download.html">Download</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a class="btn btn-primary nav__cta" href="download.html">Download</a>
+    <button class="nav__menu-btn" data-menu-toggle aria-label="Toggle menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+  <div class="nav__mobile" data-menu-panel>
+    <a href="features.html">Features</a>
+    <a href="download.html">Download</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</header>
+
+<main>
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="wrap hero__inner">
+    <p class="eyebrow reveal"><span class="dot"></span>Download</p>
+    <h1 class="reveal d1">Get Serverbox for your desktop.</h1>
+    <p class="lead reveal d2">Serverbox runs natively on macOS, Windows, and Linux. Pick your platform below, install it on your computer, and connect to your first server over SSH — nothing is installed on the remote host.</p>
+    <div class="hero__meta reveal d3">
+      <span><b>v1.0</b> &nbsp;current release</span>
+      <span><b>0</b> &nbsp;agents on your hosts</span>
+      <span><b>AES-256</b> &nbsp;encrypted local vault</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MACOS ===================== -->
+<section class="section section-divider" id="macos">
+  <div class="wrap">
+    <div class="os-head reveal">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 19.5h20"/><path d="M10 16l-1.5 3.5M14 16l1.5 3.5"/></svg>
+      <h2>macOS</h2>
+      <span class="tag">macOS 11 Big Sur or later</span>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card reveal">
+        <div class="dl-card__head">
+          <h3>Apple Silicon</h3>
+          <span class="tag">M1 · M2 · M3 · M4</span>
+        </div>
+        <p class="muted">For Macs with Apple M-series chips.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.dmg</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.zip</span></a>
+        </div>
+      </div>
+      <div class="dl-card reveal d1">
+        <div class="dl-card__head">
+          <h3>Intel</h3>
+          <span class="tag">x86_64</span>
+        </div>
+        <p class="muted">For Macs with Intel processors.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.dmg</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.zip</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WINDOWS ===================== -->
+<section class="section section-divider" id="windows">
+  <div class="wrap">
+    <div class="os-head reveal">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+      <h2>Windows</h2>
+      <span class="tag">Windows 10 or later</span>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card reveal">
+        <div class="dl-card__head">
+          <h3>x86_64</h3>
+          <span class="tag">64-bit</span>
+        </div>
+        <p class="muted">For most Intel and AMD PCs.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.exe</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.msi</span></a>
+        </div>
+      </div>
+      <div class="dl-card reveal d1">
+        <div class="dl-card__head">
+          <h3>ARM64</h3>
+          <span class="tag">AArch64</span>
+        </div>
+        <p class="muted">For Snapdragon and ARM-based Windows devices.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.exe</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.msi</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LINUX ===================== -->
+<section class="section section-divider" id="linux">
+  <div class="wrap">
+    <div class="os-head reveal">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 7 10 12 5 17"/><line x1="13" y1="17" x2="20" y2="17"/></svg>
+      <h2>Linux</h2>
+      <span class="tag">Most distributions</span>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card reveal">
+        <div class="dl-card__head">
+          <h3>x86_64</h3>
+          <span class="tag">64-bit</span>
+        </div>
+        <p class="muted">For Intel and AMD systems.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.AppImage</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.deb</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.rpm</span></a>
+        </div>
+      </div>
+      <div class="dl-card reveal d1">
+        <div class="dl-card__head">
+          <h3>ARM64</h3>
+          <span class="tag">AArch64</span>
+        </div>
+        <p class="muted">For ARM servers and single-board computers.</p>
+        <div class="dl-links">
+          <a class="btn btn-primary" href="#">Download <span class="mono">.AppImage</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.deb</span></a>
+          <a class="btn btn-outline" href="#">Download <span class="mono">.rpm</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:2rem">
+      <p class="muted" style="max-width:54rem">Not sure which file to grab? <span class="mono">.AppImage</span> runs on most distributions without installation — just download, allow execute, and open. Use <span class="mono">.deb</span> on Debian, Ubuntu, and Linux Mint, and <span class="mono">.rpm</span> on Fedora, RHEL, openSUSE, and Rocky.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DARK CTA ===================== -->
+<section class="section dark">
+  <div class="wrap">
+    <div class="split" style="align-items:center">
+      <div class="reveal">
+        <p class="eyebrow"><span class="dot"></span>New here</p>
+        <h2 style="margin-top:1rem">See what Serverbox replaces.</h2>
+        <p class="lead" style="margin-top:1rem">From server dashboards to terminals, files, containers, and operations, here is everything Serverbox brings together in one window.</p>
+        <div class="btn-row" style="margin-top:2rem">
+          <a class="btn btn-primary" href="features.html">Explore features <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn btn-outline" href="contact.html">Contact us</a>
+        </div>
+      </div>
+      <ul class="stats reveal d1">
+        <li class="stat"><p class="num">0<span class="plus">+</span></p><p class="lab">Agents installed on your servers</p></li>
+        <li class="stat"><p class="num">2×</p><p class="lab">Container runtimes — Docker &amp; Podman</p></li>
+        <li class="stat"><p class="num">3</p><p class="lab">Desktop platforms — macOS, Windows, Linux</p></li>
+        <li class="stat"><p class="num">AES-256</p><p class="lab">Encrypted local vault</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__cols">
+      <div class="foot__col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Capabilities</h5>
+        <ul>
+          <li><a href="features.html">Dashboards &amp; terminals</a></li>
+          <li><a href="features.html">Files &amp; SFTP</a></li>
+          <li><a href="features.html">Docker &amp; Podman</a></li>
+          <li><a href="features.html">Compose &amp; tunnels</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Security</h5>
+        <ul>
+          <li><a href="features.html">Agentless</a></li>
+          <li><a href="features.html">Encrypted vault</a></li>
+          <li><a href="#" id="themeNote">Light &amp; dark</a></li>
+        </ul>
+      </div>
+      <div class="foot__col">
+        <h5>Download</h5>
+        <ul>
+          <li><a href="download.html#macos">macOS</a></li>
+          <li><a href="download.html#windows">Windows</a></li>
+          <li><a href="download.html#linux">Linux</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__rule"></div>
+    <div class="foot__bottom">
+      <p>© <span id="year">2025</span> Serverbox · Agentless SSH control panel</p>
+      <div class="foot__legal">
+        <a href="download.html">Download</a>
+        <a href="features.html">Features</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+  <div class="wordmark" aria-hidden="true">Serverbox</div>
+</footer>
+
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules
+dist
+target
+**/.DS_Store
+src-tauri/gen
+*.log
+__pycache__/
+*.py[cod]
+**/__pycache__
+AGENTS.md
+PROJECT.md

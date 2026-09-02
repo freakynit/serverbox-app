@@ -1,0 +1,177 @@
+name: Build and publish release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Version tag to create or update (for example, v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  create-release:
+    name: Create or reuse GitHub release
+    runs-on: ubuntu-22.04
+    outputs:
+      release_id: ${{ steps.release.outputs.release_id }}
+      release_draft: ${{ steps.release.outputs.release_draft }}
+    steps:
+      - name: Create or reuse draft release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$RELEASE_TAG" != v* || "$RELEASE_TAG" == */* || "$RELEASE_TAG" == *[!a-zA-Z0-9._-]* ]]; then
+            echo "RELEASE_TAG must start with v and contain only letters, numbers, dots, underscores, or hyphens." >&2
+            exit 1
+          fi
+
+          releases_endpoint="repos/${GITHUB_REPOSITORY}/releases?per_page=100"
+          release_json="$(gh api "$releases_endpoint" | jq -c --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)][0]')"
+          if [[ "$release_json" != "null" ]]; then
+            echo "Reusing existing release for ${RELEASE_TAG}."
+          else
+            echo "Creating draft release for ${RELEASE_TAG}."
+            gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Serverbox ${RELEASE_TAG}" \
+              --generate-notes \
+              --draft
+
+            # Newly created draft releases can take a few seconds to appear in
+            # the releases list. The by-tag endpoint cannot retrieve drafts.
+            for attempt in {1..10}; do
+              release_json="$(gh api "$releases_endpoint" | jq -c --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)][0]')"
+              [[ "$release_json" != "null" ]] && break
+              echo "Waiting for GitHub to return the new draft release (attempt ${attempt}/10)."
+              sleep 3
+            done
+          fi
+
+          if [[ "$release_json" == "null" ]]; then
+            echo "Could not find the GitHub release for ${RELEASE_TAG} after creating it." >&2
+            exit 1
+          fi
+
+          {
+            echo "release_id=$(jq -r '.id' <<<"$release_json")"
+            echo "release_draft=$(jq -r '.draft' <<<"$release_json")"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: ${{ matrix.name }}
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # GitHub-hosted runners build natively for each architecture.
+          - name: macOS Intel (x86_64)
+            runner: macos-15-intel
+            os: macos
+            rust_target: x86_64-apple-darwin
+          - name: macOS Apple Silicon (ARM64)
+            runner: macos-14
+            os: macos
+            rust_target: aarch64-apple-darwin
+          - name: Linux Intel (x86_64)
+            runner: ubuntu-22.04
+            os: linux
+            rust_target: x86_64-unknown-linux-gnu
+          - name: Linux ARM64
+            runner: ubuntu-22.04-arm
+            os: linux
+            rust_target: aarch64-unknown-linux-gnu
+          - name: Windows Intel (x86_64)
+            runner: windows-2025
+            os: windows
+            rust_target: x86_64-pc-windows-msvc
+          - name: Windows ARM64
+            runner: windows-11-arm
+            os: windows
+            rust_target: aarch64-pc-windows-msvc
+
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - name: Install Linux system dependencies
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            file \
+            libayatana-appindicator3-dev \
+            libgtk-3-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            librsvg2-dev \
+            patchelf \
+            xdg-utils
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build and upload bundles
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          # Ad-hoc signing avoids Apple Silicon apps being reported as damaged.
+          # It is not notarization; users may still need to approve the app in Privacy & Security.
+          APPLE_SIGNING_IDENTITY: ${{ matrix.os == 'macos' && '-' || '' }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ env.RELEASE_TAG }}
+          releaseDraft: ${{ needs.create-release.outputs.release_draft }}
+          releaseAssetNamePattern: "Serverbox-v[version]-[platform]-[arch]-[bundle][setup][ext]"
+          uploadUpdaterJson: false
+          uploadUpdaterSignatures: false
+          args: --target ${{ matrix.rust_target }}
+
+  publish-release:
+    name: Publish release
+    needs: [create-release, build]
+    if: needs.create-release.outputs.release_draft == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.create-release.outputs.release_id }}
+        run: gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" -f draft=false
