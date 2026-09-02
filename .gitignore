@@ -7,5 +7,6 @@ src-tauri/gen
 __pycache__/
 *.py[cod]
 **/__pycache__
+LOCAL.md
 AGENTS.md
 PROJECT.md
