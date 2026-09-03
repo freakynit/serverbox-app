@@ -318,6 +318,15 @@ h1 { margin-bottom: 0; font: 600 35px/1.05 Georgia, "Times New Roman", serif; le
 
 .modal-security { width: min(560px, 100%); }
 .security-modal-body { display: flex; flex-direction: column; gap: 15px; }
+.settings-section { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
+.settings-section-copy { min-width: 0; }
+.settings-section-copy h3 { margin: 0; color: var(--ink); font: 600 18px/1.2 Georgia, serif; }
+.settings-section-copy p { max-width: 330px; margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.interface-scale-control { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; }
+.interface-scale-control output { min-width: 46px; color: var(--ink); font: 700 12px/1 monospace; text-align: center; }
+.interface-scale-control .icon-button:disabled { opacity: .4; cursor: not-allowed; }
+.interface-scale-control .scale-reset { height: 36px; padding: 0 10px; }
+.settings-divider { height: 1px; background: var(--line); }
 .credential-status-card { display: flex; flex-direction: column; gap: 5px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--canvas); }
 .credential-status-card > span { color: var(--faint); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .credential-status-card strong { font: 600 16px/1.2 Georgia, serif; }

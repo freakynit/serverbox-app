@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
@@ -54,7 +55,15 @@ import "./styles.css";
 
 const root = document.querySelector<HTMLDivElement>("#app")!;
 const appWindow = getCurrentWindow();
+const appWebview = getCurrentWebview();
 const platform = /mac/i.test(navigator.platform || navigator.userAgent) ? "macos" : /win/i.test(navigator.platform || navigator.userAgent) ? "windows" : "linux";
+
+const INTERFACE_SCALE_LEVELS = [0.8, 1, 1.2, 1.4, 1.6, 1.8, 2] as const;
+const DEFAULT_INTERFACE_SCALE = 1;
+const storedInterfaceScale = Number(localStorage.getItem("serverbox-interface-scale"));
+let interfaceScale = INTERFACE_SCALE_LEVELS.includes(storedInterfaceScale as typeof INTERFACE_SCALE_LEVELS[number])
+  ? storedInterfaceScale
+  : DEFAULT_INTERFACE_SCALE;
 
 let snapshot: AppStateSnapshot = { version: 1, servers: [], sshKeys: [], sshConfigEntries: [] };
 let activeServerId: string | null = null;
@@ -1043,6 +1052,39 @@ function showToast(message: string, kind: "success" | "info" = "success"): void 
   appToastTimer = window.setTimeout(() => dismissToast(), 2600);
 }
 
+function syncInterfaceScaleControls(): void {
+  const currentIndex = INTERFACE_SCALE_LEVELS.indexOf(interfaceScale as typeof INTERFACE_SCALE_LEVELS[number]);
+  const value = root.querySelector<HTMLElement>("[data-interface-scale-value]");
+  const decrease = root.querySelector<HTMLButtonElement>("[data-action='interface-scale-decrease']");
+  const increase = root.querySelector<HTMLButtonElement>("[data-action='interface-scale-increase']");
+  const reset = root.querySelector<HTMLButtonElement>("[data-action='interface-scale-reset']");
+  if (value) value.textContent = `${Math.round(interfaceScale * 100)}%`;
+  if (decrease) decrease.disabled = currentIndex <= 0;
+  if (increase) increase.disabled = currentIndex >= INTERFACE_SCALE_LEVELS.length - 1;
+  if (reset) reset.disabled = interfaceScale === DEFAULT_INTERFACE_SCALE;
+}
+
+async function setInterfaceScale(scale: number, announce = true): Promise<void> {
+  if (!INTERFACE_SCALE_LEVELS.includes(scale as typeof INTERFACE_SCALE_LEVELS[number])) return;
+  try {
+    await appWebview.setZoom(scale);
+    interfaceScale = scale;
+    localStorage.setItem("serverbox-interface-scale", String(scale));
+    syncInterfaceScaleControls();
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => fitAddon?.fit()));
+    if (announce) showToast(`Interface scale set to ${Math.round(scale * 100)}%.`, "info");
+  } catch (error) {
+    if (announce) showToast(`Could not change interface scale: ${errorText(error)}`, "info");
+  }
+}
+
+async function stepInterfaceScale(direction: -1 | 1): Promise<void> {
+  const currentIndex = INTERFACE_SCALE_LEVELS.indexOf(interfaceScale as typeof INTERFACE_SCALE_LEVELS[number]);
+  const nextIndex = Math.max(0, Math.min(INTERFACE_SCALE_LEVELS.length - 1, currentIndex + direction));
+  if (nextIndex === currentIndex) return;
+  await setInterfaceScale(INTERFACE_SCALE_LEVELS[nextIndex]);
+}
+
 function dismissToast(): void {
   if (appToastTimer !== undefined) window.clearTimeout(appToastTimer);
   appToastTimer = undefined;
@@ -1274,7 +1316,9 @@ function renderSecurityModal(): string {
     : credentialStatus.unlocked
       ? "Unlocked for this session"
       : "Locked until you enter your master password";
-  return renderModalShell("Settings", "Manage the encrypted local vault used for SSH credentials.", `<div class="modal-body security-modal-body"><div class="credential-status-card"><span>Vault status</span><strong>${status}</strong><small>Server names and connection details remain in the local profile database; saved secrets are kept in a separate encrypted file.</small></div>${renderCredentialWarning()}${credentialSettingsNotice ? `<div class="security-notice">${icon("check")}<span>${escapeHtml(credentialSettingsNotice)}</span></div>` : ""}${credentialSettingsError ? `<div class="inline-error">${icon("info")}<span>${escapeHtml(credentialSettingsError)}</span></div>` : ""}<div class="security-actions"><button class="button button-quiet" data-action="change-master-password" ${credentialStatus.configured ? "" : "disabled"}>${icon("key")} Change master password</button><button class="button button-danger" data-action="reset-credentials" ${credentialStatus.configured ? "" : "disabled"}>${icon("trash")} Reset all saved credentials</button></div><p class="security-footnote">Resetting removes saved credentials from this device but leaves your server profiles in place. You will create a new master password the next time you save credentials.</p><div class="modal-actions"><button class="button button-quiet" data-action="close-modal">Close</button></div></div>`, "modal-security");
+  const scalePercent = Math.round(interfaceScale * 100);
+  const scaleIndex = INTERFACE_SCALE_LEVELS.indexOf(interfaceScale as typeof INTERFACE_SCALE_LEVELS[number]);
+  return renderModalShell("Settings", "Adjust Serverbox's appearance and manage locally saved credentials.", `<div class="modal-body security-modal-body"><section class="settings-section" aria-labelledby="appearance-settings-title"><div class="settings-section-copy"><h3 id="appearance-settings-title">Interface scale</h3><p>Increase the entire interface on HiDPI displays. You can also use ${platform === "macos" ? "Command" : "Ctrl"} +/− and ${platform === "macos" ? "Command" : "Ctrl"} 0.</p></div><div class="interface-scale-control" role="group" aria-label="Interface scale"><button class="icon-button" type="button" data-action="interface-scale-decrease" aria-label="Decrease interface scale" title="Decrease interface scale" ${scaleIndex <= 0 ? "disabled" : ""}>${icon("minus")}</button><output data-interface-scale-value aria-live="polite">${scalePercent}%</output><button class="icon-button" type="button" data-action="interface-scale-increase" aria-label="Increase interface scale" title="Increase interface scale" ${scaleIndex >= INTERFACE_SCALE_LEVELS.length - 1 ? "disabled" : ""}>${icon("plus")}</button><button class="button button-quiet scale-reset" type="button" data-action="interface-scale-reset" ${interfaceScale === DEFAULT_INTERFACE_SCALE ? "disabled" : ""}>Reset</button></div></section><div class="settings-divider"></div><div class="credential-status-card"><span>Vault status</span><strong>${status}</strong><small>Server names and connection details remain in the local profile database; saved secrets are kept in a separate encrypted file.</small></div>${renderCredentialWarning()}${credentialSettingsNotice ? `<div class="security-notice">${icon("check")}<span>${escapeHtml(credentialSettingsNotice)}</span></div>` : ""}${credentialSettingsError ? `<div class="inline-error">${icon("info")}<span>${escapeHtml(credentialSettingsError)}</span></div>` : ""}<div class="security-actions"><button class="button button-quiet" data-action="change-master-password" ${credentialStatus.configured ? "" : "disabled"}>${icon("key")} Change master password</button><button class="button button-danger" data-action="reset-credentials" ${credentialStatus.configured ? "" : "disabled"}>${icon("trash")} Reset all saved credentials</button></div><p class="security-footnote">Resetting removes saved credentials from this device but leaves your server profiles in place. You will create a new master password the next time you save credentials.</p><div class="modal-actions"><button class="button button-quiet" data-action="close-modal">Close</button></div></div>`, "modal-security");
 }
 
 function renderMasterPasswordModal(): string {
@@ -1609,6 +1653,9 @@ async function handleClick(event: MouseEvent): Promise<void> {
     case "retry": errorMessage = ""; await loadActiveView(false, true); break;
     case "dismiss-error": errorMessage = ""; render(); break;
     case "theme": darkMode = !darkMode; localStorage.setItem("serverbox-theme", darkMode ? "dark" : "light"); render(); break;
+    case "interface-scale-decrease": await stepInterfaceScale(-1); break;
+    case "interface-scale-increase": await stepInterfaceScale(1); break;
+    case "interface-scale-reset": await setInterfaceScale(DEFAULT_INTERFACE_SCALE); break;
     case "new-terminal": await openNewTerminal(); break;
     case "reconnect-terminal": await reconnectTerminal(); break;
     case "clear-terminal": clearActiveTerminal(); break;
@@ -3237,14 +3284,32 @@ root.addEventListener("click", (event) => {
 window.addEventListener("resize", () => { fitAddon?.fit(); });
 window.addEventListener("contextmenu", (event) => { event.preventDefault(); }, { capture: true });
 window.addEventListener("keydown", (event) => {
+  if ((event.metaKey || event.ctrlKey) && !event.altKey) {
+    if (event.key === "+" || event.key === "=") {
+      event.preventDefault();
+      void stepInterfaceScale(1);
+      return;
+    }
+    if (event.key === "-") {
+      event.preventDefault();
+      void stepInterfaceScale(-1);
+      return;
+    }
+    if (event.key === "0") {
+      event.preventDefault();
+      void setInterfaceScale(DEFAULT_INTERFACE_SCALE);
+      return;
+    }
+  }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     root.querySelector<HTMLInputElement>('[data-field="server-search"]')?.focus();
   }
   if (event.key === "Escape" && (modal || appDialogPrompt)) closeModal();
-});
+}, { capture: true });
 
 async function bootstrap(): Promise<void> {
+  await setInterfaceScale(interfaceScale, false);
   render();
   try {
     await installEventListeners();
