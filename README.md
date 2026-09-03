@@ -6,6 +6,8 @@ Built with Rust, Tauri 2, and TypeScript, Serverbox brings common administration
 
 [https://serverbox.stupidlabs.lol](https://serverbox.stupidlabs.lol)
 
+![Homescreen Screenshot](homescreen.png)
+
 ## What it does
 
 - Connect to multiple servers with password or private-key authentication, including SSH config import and bastion (ProxyJump-style) routes.
