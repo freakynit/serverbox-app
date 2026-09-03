@@ -1,6 +1,6 @@
 [package]
 name = "serverbox"
-version = "1.0.2"
+version = "1.0.3"
 description = "Serverbox is an open-source, agentless desktop control panel for Linux servers. It connects over SSH, so there is nothing to install on the servers you manage."
 authors = ["Serverbox"]
 license = "MIT"
