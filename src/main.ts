@@ -417,7 +417,7 @@ function filteredServers(): ServerProfile[] {
   if (sidebarCopyPlacement) {
     const sourceIndex = servers.findIndex((server) => server.id === sidebarCopyPlacement?.sourceId);
     const copyIndex = servers.findIndex((server) => server.id === sidebarCopyPlacement?.copyId);
-    if (sourceIndex >= 0 && copyIndex >= 0 && servers[sourceIndex].groupName === servers[copyIndex].groupName) {
+    if (sourceIndex >= 0 && copyIndex >= 0 && groupKey(servers[sourceIndex].groupName) === groupKey(servers[copyIndex].groupName)) {
       const [copy] = servers.splice(copyIndex, 1);
       servers.splice(copyIndex < sourceIndex ? sourceIndex : sourceIndex + 1, 0, copy);
     }
@@ -425,13 +425,24 @@ function filteredServers(): ServerProfile[] {
   return servers;
 }
 
+function normalizedGroupName(groupName?: string): string {
+  return groupName?.normalize("NFKC").replace(/[\u200B-\u200D\uFEFF]/gu, "").trim().replace(/\s+/gu, " ") ?? "";
+}
+
+function groupKey(groupName?: string): string {
+  return (normalizedGroupName(groupName) || "Ungrouped").toLocaleLowerCase();
+}
+
 function renderServerGroups(servers: ServerProfile[]): string {
-  const grouped = new Map<string, ServerProfile[]>();
+  const grouped = new Map<string, { label: string; servers: ServerProfile[] }>();
   for (const server of servers) {
-    const group = server.groupName?.trim() || "Ungrouped";
-    grouped.set(group, [...(grouped.get(group) ?? []), server]);
+    const label = normalizedGroupName(server.groupName) || "Ungrouped";
+    const key = groupKey(label);
+    const group = grouped.get(key) ?? { label, servers: [] };
+    group.servers.push(server);
+    grouped.set(key, group);
   }
-  return [...grouped.entries()].map(([group, items]) => `<div class="server-group"><div class="server-group-label"><span class="group-label-full">${escapeHtml(group)}</span><span class="group-label-short" aria-hidden="true">${escapeHtml(shortGroupLabel(group))}</span></div>${items.map(renderServerItem).join("")}</div>`).join("");
+  return [...grouped.values()].map(({ label, servers: items }) => `<div class="server-group"><div class="server-group-label"><span class="group-label-full">${escapeHtml(label)}</span><span class="group-label-short" aria-hidden="true">${escapeHtml(shortGroupLabel(label))}</span></div>${items.map(renderServerItem).join("")}</div>`).join("");
 }
 
 function shortGroupLabel(group: string): string {
@@ -1272,8 +1283,7 @@ function profileRouteLabel(profile: ServerProfile): string {
   return names.reverse().join(" → ");
 }
 
-function renderAuthFields(server: ServerProfile | null): string {
-  const auth = server?.authMethod ?? "password";
+function renderAuthFields(server: ServerProfile | null, auth = server?.authMethod ?? "password"): string {
   if (auth === "privateKey") return `<label class="field"><span>Private key</span><select name="keyPath"><option value="">Choose a key…</option>${snapshot.sshKeys.map((key) => `<option value="${escapeHtml(key.path)}" ${server?.keyPath === key.path ? "selected" : ""}>${escapeHtml(key.name)} · ${escapeHtml(key.kind)}</option>`).join("")}</select>${snapshot.sshKeys.length ? "" : `<small class="field-hint">No keys detected in ~/.ssh. You can still paste a path below.</small>`}<input name="customKeyPath" value="${escapeHtml(server?.keyPath && !snapshot.sshKeys.some((key) => key.path === server.keyPath) ? server.keyPath : "")}" placeholder="/Users/you/.ssh/id_ed25519"/></label><label class="field"><span>Key passphrase <small>optional · leave blank to keep</small></span><input name="keyPassphrase" type="password" autocomplete="new-password" placeholder="Only if the key is encrypted"/></label><label class="field"><span>Sudo password <small>optional · for protected actions</small></span><input name="sudoPassword" type="password" autocomplete="new-password" placeholder="Leave blank if sudo is passwordless"/></label>`;
   return `<label class="field"><span>Password <small>${server ? "leave blank to keep" : ""}</small></span><input name="password" type="password" autocomplete="current-password" placeholder="SSH password"/></label><label class="field"><span>Sudo password <small>optional · leave blank to use passwordless sudo</small></span><input name="sudoPassword" type="password" autocomplete="new-password" placeholder="Only needed for protected actions"/></label>`;
 }
@@ -1340,7 +1350,7 @@ function renderAuthFieldsForForm(form: HTMLFormElement): void {
   const selected = form.querySelector<HTMLInputElement>('input[name="authMethod"]:checked')?.value ?? "password";
   const target = form.querySelector<HTMLElement>("[data-auth-fields]");
   if (target) {
-    target.innerHTML = renderAuthFields(editingServer ? { ...editingServer, authMethod: selected as "password" | "privateKey" } : null);
+    target.innerHTML = renderAuthFields(editingServer, selected as "password" | "privateKey");
     enhanceSelects(root, target);
   }
 }
@@ -1927,7 +1937,7 @@ async function saveServerForm(form: HTMLFormElement, testAfter: boolean): Promis
     authMethod,
     keyPath: authMethod === "privateKey" ? customKeyPath || selectedKeyPath || undefined : undefined,
     jumpHostId: String(data.get("jumpHostId") ?? "").trim() || undefined,
-    groupName: String(data.get("groupName") ?? "").trim() || undefined,
+    groupName: normalizedGroupName(String(data.get("groupName") ?? "")) || undefined,
     tags: String(data.get("tags") ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
     notes: String(data.get("notes") ?? ""),
     favorite: data.get("favorite") === "on",
