@@ -23,7 +23,7 @@ serde_yaml = "0.9"
 base64 = "0.22"
 sha2 = "0.10"
 rusqlite = { version = "0.32", features = ["bundled"] }
-ssh2 = { version = "0.9", features = ["vendored-openssl"] }
+ssh2 = { version = "0.9", features = ["vendored-openssl", "openssl-on-win32"] }
 aes-gcm = "0.10"
 argon2 = "0.5"
 rand = "0.8"
