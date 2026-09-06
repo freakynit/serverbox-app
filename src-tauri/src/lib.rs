@@ -1445,6 +1445,7 @@ fn fit_initial_window_to_work_area<R: Runtime>(window: &WebviewWindow<R>) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let data_dir = app.path().app_local_data_dir()?;
             let state = AppState::open(data_dir).map_err(std::io::Error::other)?;

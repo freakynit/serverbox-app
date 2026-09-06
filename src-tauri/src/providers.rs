@@ -2713,8 +2713,7 @@ pub fn write_file(
             let _ = sftp.unlink(&temporary_path);
             return Err(error);
         }
-        let rename_flags = RenameFlags::ATOMIC | RenameFlags::NATIVE | RenameFlags::OVERWRITE;
-        if let Err(error) = sftp.rename(&temporary_path, &path, Some(rename_flags)) {
+        if let Err(error) = rename_staging(&sftp, &temporary_path, &path, true) {
             let _ = sftp.unlink(&temporary_path);
             return Err(format!("Could not save {}: {error}", path.display()));
         }
@@ -3368,11 +3367,7 @@ fn upload_file(
         let _ = sftp.unlink(&temporary_path);
         return Err(error);
     }
-    let mut rename_flags = RenameFlags::ATOMIC | RenameFlags::NATIVE;
-    if overwrite {
-        rename_flags |= RenameFlags::OVERWRITE;
-    }
-    if let Err(error) = sftp.rename(&temporary_path, destination, Some(rename_flags)) {
+    if let Err(error) = rename_staging(sftp, &temporary_path, destination, overwrite) {
         let _ = sftp.unlink(&temporary_path);
         return Err(format!(
             "Could not finish uploading {}: {error}",
@@ -3421,6 +3416,54 @@ fn record_upload_conflict(
         if paths.len() < 5 {
             paths.push(destination.to_string_lossy().to_string());
         }
+    }
+}
+
+fn rename_staging(
+    sftp: &ssh2::Sftp,
+    temporary_path: &Path,
+    destination: &Path,
+    overwrite: bool,
+) -> Result<(), ssh2::Error> {
+    // Many SFTP servers do not implement the posix-rename@openssh.com extension
+    // behind ATOMIC/NATIVE, and some do not implement OVERWRITE either. They
+    // answer those renames with a generic SSH_FX_FAILURE (SFTP error 4), which
+    // previously surfaced as "Could not finish uploading ...: [SFTP(4)] failure"
+    // even though the staging upload itself succeeded. Fall back from the
+    // preferred atomic rename down to the portable unlink + rename sequence.
+    if overwrite {
+        if sftp
+            .rename(
+                temporary_path,
+                destination,
+                Some(RenameFlags::ATOMIC | RenameFlags::NATIVE | RenameFlags::OVERWRITE),
+            )
+            .is_ok()
+        {
+            return Ok(());
+        }
+        if sftp
+            .rename(temporary_path, destination, Some(RenameFlags::OVERWRITE))
+            .is_ok()
+        {
+            return Ok(());
+        }
+        // Last resort for servers without any overwrite-aware rename: remove
+        // the destination first, then rename without overwrite flags.
+        let _ = sftp.unlink(destination);
+        sftp.rename(temporary_path, destination, None)
+    } else {
+        if sftp
+            .rename(
+                temporary_path,
+                destination,
+                Some(RenameFlags::ATOMIC | RenameFlags::NATIVE),
+            )
+            .is_ok()
+        {
+            return Ok(());
+        }
+        sftp.rename(temporary_path, destination, None)
     }
 }
 

@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { SerializeAddon } from "@xterm/addon-serialize";
@@ -2563,16 +2564,40 @@ async function changeRemoteOwner(path: string): Promise<void> {
   try { await invokeCommand("remote_file_action", { serverId: activeServerId, action: "chown", path, target: owner }); await loadFiles(); } catch (error) { setError(error); }
 }
 
+async function uploadLocalPathFallback(kind: "file" | "folder"): Promise<string[] | null> {
+  const selected = await requestTextInput(kind === "file"
+    ? { title: "Upload a local file", label: "Absolute local file path", defaultValue: "", placeholder: platform === "windows" ? "C:\\Users\\name\\Desktop\\archive.tar.gz" : "~/Desktop/archive.tar.gz" }
+    : { title: "Upload a local folder", label: "Absolute local folder path", defaultValue: "", placeholder: platform === "windows" ? "C:\\Users\\name\\Desktop\\project" : "~/Desktop/project" });
+  if (!selected?.trim()) return null;
+  return [selected.trim()];
+}
+
 async function uploadLocal(): Promise<void> {
   if (!activeServerId) return;
-  const selected = await requestTextInput({ title: "Upload a local file", label: "Absolute local file path", defaultValue: "", placeholder: platform === "windows" ? "C:\\Users\\name\\Desktop\\archive.tar.gz" : "~/Desktop/archive.tar.gz" });
-  if (selected?.trim()) await transferUpload(selected.trim());
+  let selected: string[] | null = null;
+  try {
+    const picked = await open({ multiple: true, directory: false });
+    if (picked === null) return;
+    selected = Array.isArray(picked) ? picked : [picked];
+  } catch {
+    selected = await uploadLocalPathFallback("file");
+  }
+  if (!selected) return;
+  for (const path of selected) await transferUpload(path);
 }
 
 async function uploadLocalFolder(): Promise<void> {
   if (!activeServerId) return;
-  const selected = await requestTextInput({ title: "Upload a local folder", label: "Absolute local folder path", defaultValue: "", placeholder: platform === "windows" ? "C:\\Users\\name\\Desktop\\project" : "~/Desktop/project" });
-  if (selected?.trim()) await transferUpload(selected.trim());
+  let selected: string[] | null = null;
+  try {
+    const picked = await open({ multiple: false, directory: true });
+    if (picked === null) return;
+    selected = Array.isArray(picked) ? picked : [picked];
+  } catch {
+    selected = await uploadLocalPathFallback("folder");
+  }
+  if (!selected) return;
+  for (const path of selected) await transferUpload(path);
 }
 
 async function transferUpload(localPath: string): Promise<void> {
@@ -2617,12 +2642,24 @@ async function downloadRemote(path: string): Promise<void> {
   if (!activeServerId) return;
   const file = remoteFiles.find((item) => item.path === path);
   const directory = file?.kind === "directory";
-  const localPath = await requestTextInput({
-    title: directory ? "Download remote folder" : "Download remote file",
-    label: directory ? "Local destination folder" : "Local destination file",
-    defaultValue: directory ? "~/Downloads" : `~/Downloads/${file?.name ?? "download"}`,
-    placeholder: platform === "windows" ? "C:\\Users\\name\\Downloads" : "~/Downloads",
-  });
+  let localPath: string | null = null;
+  try {
+    if (directory) {
+      const picked = await open({ multiple: false, directory: true });
+      if (picked === null) return;
+      localPath = Array.isArray(picked) ? picked[0] ?? null : picked;
+    } else {
+      localPath = await save({ defaultPath: file?.name ?? "download" });
+      if (localPath === null) return;
+    }
+  } catch {
+    localPath = await requestTextInput({
+      title: directory ? "Download remote folder" : "Download remote file",
+      label: directory ? "Local destination folder" : "Local destination file",
+      defaultValue: directory ? "~/Downloads" : `~/Downloads/${file?.name ?? "download"}`,
+      placeholder: platform === "windows" ? "C:\\Users\\name\\Downloads" : "~/Downloads",
+    });
+  }
   if (!localPath?.trim()) return;
   try {
     transfer = await invokeCommand<TransferProgress>("download_path", { serverId: activeServerId, remotePath: path, localPath: localPath.trim() });
