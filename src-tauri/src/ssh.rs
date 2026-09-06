@@ -3,7 +3,10 @@ use crate::storage::Store;
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use serde_json::json;
 use sha2::{Digest, Sha256};
-use ssh2::{Channel, CheckResult, ErrorCode, KnownHostFileKind, Session, Sftp};
+use ssh2::{
+    Channel, CheckResult, ErrorCode, KeyboardInteractivePrompt, KnownHostFileKind, Prompt,
+    Session, Sftp,
+};
 use std::collections::HashMap;
 use std::fs;
 use std::io::{ErrorKind, Read, Write};
@@ -546,6 +549,72 @@ fn relay_jump(
     }
 }
 
+struct PasswordPrompter<'a> {
+    password: &'a str,
+    password_sent: bool,
+    mfa_prompt: Option<String>,
+}
+
+impl<'a> PasswordPrompter<'a> {
+    fn new(password: &'a str) -> Self {
+        Self {
+            password,
+            password_sent: false,
+            mfa_prompt: None,
+        }
+    }
+
+    fn looks_like_password_prompt(prompt: &Prompt<'_>) -> bool {
+        if prompt.echo {
+            return false;
+        }
+        let lower = prompt.text.to_lowercase();
+        if lower.contains("verification")
+            || lower.contains("passcode")
+            || lower.contains("otp")
+            || lower.contains("one-time")
+            || lower.contains("token")
+            || lower.contains("authenticator")
+            || lower.contains("duo")
+            || lower.contains("yubikey")
+        {
+            return false;
+        }
+        lower.contains("password") || lower.trim().is_empty() || lower.trim() == ":"
+    }
+}
+
+impl<'a> KeyboardInteractivePrompt for PasswordPrompter<'a> {
+    fn prompt<'b>(
+        &mut self,
+        _username: &str,
+        _instructions: &str,
+        prompts: &[Prompt<'b>],
+    ) -> Vec<String> {
+        let mut responses = Vec::with_capacity(prompts.len());
+
+        for prompt in prompts {
+            if !self.password_sent && Self::looks_like_password_prompt(prompt) {
+                self.password_sent = true;
+                responses.push(self.password.to_string());
+            } else {
+                if self.mfa_prompt.is_none() {
+                    let text = prompt.text.trim();
+                    let desc = if text.is_empty() {
+                        "secondary challenge"
+                    } else {
+                        text
+                    };
+                    self.mfa_prompt = Some(desc.to_string());
+                }
+                responses.push(String::new());
+            }
+        }
+
+        responses
+    }
+}
+
 fn authenticate(session: &Session, profile: &ServerProfile, store: &Store) -> Result<(), String> {
     match profile.auth_method {
         AuthMethod::Password => {
@@ -556,14 +625,60 @@ fn authenticate(session: &Session, profile: &ServerProfile, store: &Store) -> Re
                         profile.name
                     )
                 })?);
-            session
-                .userauth_password(&profile.username, &password)
-                .map_err(|error| {
-                    format!(
-                        "Password authentication failed for {}: {error}",
+
+            let methods = session.auth_methods(&profile.username).unwrap_or("");
+            let supports_password =
+                methods.is_empty() || methods.split(',').any(|m| m.trim() == "password");
+            let supports_kbdint =
+                methods.is_empty() || methods.split(',').any(|m| m.trim() == "keyboard-interactive");
+
+            if !supports_password && !supports_kbdint {
+                return Err(format!(
+                    "Password authentication is not supported by {} (server offers: {methods}). Try using an SSH private key.",
+                    profile.name
+                ));
+            }
+
+            let mut pwd_error = None;
+            let mut kbd_error = None;
+
+            if supports_password {
+                if let Err(error) = session.userauth_password(&profile.username, &password) {
+                    pwd_error = Some(error.to_string());
+                }
+            }
+
+            let mut prompter = PasswordPrompter::new(&password);
+            if !session.authenticated() && supports_kbdint {
+                if let Err(error) =
+                    session.userauth_keyboard_interactive(&profile.username, &mut prompter)
+                {
+                    kbd_error = Some(error.to_string());
+                }
+            }
+
+            if !session.authenticated() {
+                if let Some(mfa) = prompter.mfa_prompt {
+                    return Err(format!(
+                        "Authentication for {} requires multi-factor authentication or an interactive challenge ('{mfa}'), which is not supported for stored password connections. Consider using an SSH key.",
                         profile.name
-                    )
-                })?;
+                    ));
+                }
+
+                let detail = match (pwd_error, kbd_error) {
+                    (Some(pwd), Some(kbd)) if pwd == kbd => pwd,
+                    (Some(pwd), Some(kbd)) => {
+                        format!("password attempt: {pwd}; keyboard-interactive attempt: {kbd}")
+                    }
+                    (Some(pwd), None) => pwd,
+                    (None, Some(kbd)) => kbd,
+                    (None, None) => "Authentication rejected".to_string(),
+                };
+                return Err(format!(
+                    "Password authentication failed for {}: {detail}",
+                    profile.name
+                ));
+            }
         }
         AuthMethod::PrivateKey => {
             let key_path = profile
